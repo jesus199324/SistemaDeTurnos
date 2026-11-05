@@ -14,7 +14,7 @@ export default function ConfigurarPage() {
 }
 
 function Configurar({ pin, logout }: { pin: string; logout: () => void }) {
-  const { state, refresh } = useTurnero();
+  const { state, offline, refresh } = useTurnero();
   const [draft, setDraft] = useState<Config | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -28,7 +28,7 @@ function Configurar({ pin, logout }: { pin: string; logout: () => void }) {
   if (!state || !draft) {
     return (
       <div className="grid min-h-screen place-items-center text-slate-500">
-        <Loader2 className="animate-spin" />
+        {offline ? <p className="max-w-md px-6 text-center">{offline}</p> : <Loader2 className="animate-spin" />}
       </div>
     );
   }

@@ -9,20 +9,22 @@ const POLL_MS = 1500;
 /** Estado compartido del turnero, se refresca solo cada pocos segundos. */
 export function useTurnero() {
   const [state, setState] = useState<PublicState | null>(null);
-  const [offline, setOffline] = useState(false);
+  /** Mensaje si no se pudo leer el estado ('' si todo anda bien) */
+  const [offline, setOffline] = useState('');
   const alive = useRef(true);
 
   const refresh = useCallback(async () => {
     try {
       const res = await fetch('/api/state', { cache: 'no-store' });
-      if (!res.ok) throw new Error();
-      const data = (await res.json()) as PublicState;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'No hay conexión con el servidor…');
       if (alive.current) {
-        setState(data);
-        setOffline(false);
+        setState(data as PublicState);
+        setOffline('');
       }
-    } catch {
-      if (alive.current) setOffline(true);
+    } catch (e) {
+      const msg = e instanceof Error && e.message !== 'Failed to fetch' ? e.message : 'No hay conexión con el servidor…';
+      if (alive.current) setOffline(msg);
     }
   }, []);
 

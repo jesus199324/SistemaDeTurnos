@@ -6,14 +6,14 @@ export async function POST(req: Request) {
   const body = await readJson(req);
   const desk = Number(body.desk);
 
-  return handle(() => {
+  return handle(async () => {
     switch (body.action) {
       case 'next': {
         const sectors = Array.isArray(body.sectors) ? body.sectors.map(String) : undefined;
-        return { call: callNext(desk, sectors) };
+        return { call: await callNext(desk, sectors) };
       }
       case 'call':
-        return { call: callCode(desk, String(body.code ?? '')) };
+        return { call: await callCode(desk, String(body.code ?? '')) };
       case 'repeat':
         return repeatCall(desk);
       case 'done':

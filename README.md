@@ -42,11 +42,21 @@ Por defecto es `1234`. Para cambiarlo, crear un archivo `.env.local` (ver `.env.
 TURNERO_PIN=4821
 ```
 
+## Publicarlo en Vercel
+
+1. Importar el repositorio en Vercel (se detecta solo como Next.js).
+2. En el proyecto de Vercel: **Storage → Create Database → Upstash (Redis) → Connect**. Es gratis para este uso y crea solas las variables `KV_REST_API_URL` y `KV_REST_API_TOKEN`.
+3. En **Settings → Environment Variables** agregar `TURNERO_PIN` con el PIN que quieras.
+4. Volver a hacer deploy (**Deployments → ⋯ → Redeploy**).
+
+Si falta el paso 2, las pantallas muestran un mensaje que explica qué conectar.
+
 ## Dónde se guardan los datos
 
-En `data/turnero.json`, que se crea solo. No se pierde nada si se reinicia la computadora. Para guardarlo en otra carpeta se usa la variable `TURNERO_DATA_DIR`.
+- **Con Redis** (Vercel): en la base Upstash conectada.
+- **Sin Redis** (una computadora del local): en `data/turnero.json`, que se crea solo. No se pierde nada si se reinicia la computadora. La carpeta se puede cambiar con `TURNERO_DATA_DIR`.
 
-Toda la lógica de turnos está en `src/lib/store.ts`. Para llevarlo a la nube con varios servidores (por ejemplo Firebase App Hosting con más de una instancia), basta con reemplazar ahí las funciones `load()` y `save()` por una base de datos como Firestore.
+La numeración se reinicia a medianoche de Montevideo. Para otra zona horaria: `TURNERO_TZ=America/Argentina/Buenos_Aires`.
 
 ## Estructura
 
@@ -60,7 +70,8 @@ src/
     api/                  state, tickets, desk, config, reset, login
   components/             PinGate (pedir PIN), StaffNav (menú del personal)
   lib/
-    store.ts              Lógica y almacenamiento de turnos
+    store.ts              Lógica de turnos
+    storage.ts            Guardado: Redis (Vercel) o archivo JSON
     client.ts             Actualización automática, sonido y voz
     types.ts              Tipos compartidos
 ```

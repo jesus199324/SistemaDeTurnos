@@ -3,6 +3,6 @@ import { getState } from '@/lib/store';
 
 export const dynamic = 'force-dynamic';
 
-export function GET() {
-  return handle(() => getState());
+export async function GET() {
+  return handle(getState);
 }

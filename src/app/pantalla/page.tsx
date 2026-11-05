@@ -80,7 +80,7 @@ export default function PantallaPage() {
             {now.toLocaleString('es', { weekday: 'long', hour: '2-digit', minute: '2-digit' })}
           </p>
         )}
-        {offline && <p className="mt-3 text-amber-400">Reconectando…</p>}
+        {offline && <p className="mt-3 text-amber-400">{state ? 'Reconectando…' : offline}</p>}
       </aside>
 
       {!soundOn && (

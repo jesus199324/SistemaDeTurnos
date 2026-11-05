@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { StorageNotConfigured } from './storage';
 import { StoreError } from './store';
 
 /** PIN para usar el mostrador y la configuración. Se cambia con la variable TURNERO_PIN. */
@@ -12,12 +13,15 @@ export function unauthorized() {
   return NextResponse.json({ error: 'PIN incorrecto.' }, { status: 401 });
 }
 
-export function handle<T>(fn: () => T) {
+export async function handle<T>(fn: () => T | Promise<T>) {
   try {
-    return NextResponse.json(fn() ?? { ok: true });
+    return NextResponse.json((await fn()) ?? { ok: true });
   } catch (e) {
     if (e instanceof StoreError) {
       return NextResponse.json({ error: e.message }, { status: 400 });
+    }
+    if (e instanceof StorageNotConfigured) {
+      return NextResponse.json({ error: e.message }, { status: 503 });
     }
     console.error(e);
     return NextResponse.json({ error: 'Error inesperado.' }, { status: 500 });
